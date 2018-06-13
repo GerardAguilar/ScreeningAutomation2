@@ -377,116 +377,124 @@ public class FitnesseTestFixture {
 
 	public void initialize() throws Exception {
 //			System.out.println("initialize");
-			boolean setupFirefoxDriver = false;//currently has errors
-			boolean setupChromeDriver = true;
-			
-		    navigationPath = new ArrayList<String>();
-		    navigationPathAlternate = new ArrayList<String>();
-		    instanceStartTime = (new Timestamp(System.currentTimeMillis())).getTime()+"";
-		    
-	        File baselineDirectory = new File("C:\\baseline");
-	        if (!baselineDirectory.exists()) {
-	        	baselineDirectory.mkdirs();
-	        }
-	        
-	        File currentDirectory = new File("C:\\current\\"+instanceStartTime);
-	        if (!currentDirectory.exists()) {
-	        	currentDirectory.mkdirs();
-	        }
-	        
-	        if(willTakeBaselineSet){
-	        	baselineSet = true;
-	        }
-	        
+		boolean setupFirefoxDriver = false;//currently has errors
+		boolean setupChromeDriver = true;
+		
+	    navigationPath = new ArrayList<String>();
+	    navigationPathAlternate = new ArrayList<String>();
+	    instanceStartTime = (new Timestamp(System.currentTimeMillis())).getTime()+"";
+	    
+        File baselineDirectory = new File("C:\\baseline");
+        if (!baselineDirectory.exists()) {
+        	baselineDirectory.mkdirs();
+        }
+        
+        File currentDirectory = new File("C:\\current\\"+instanceStartTime);
+        if (!currentDirectory.exists()) {
+        	currentDirectory.mkdirs();
+        }
+        
+        if(willTakeBaselineSet){
+        	baselineSet = true;
+        }
+        
 //	        if(willMakeALogFile) {
-	        	createLogFile();		    	
+        	createLogFile();		    	
 //	        }
+        
+		if(setupFirefoxDriver) {
+			
+			ClassLoader classLoader = getClass().getClassLoader();
+	        URL resource = classLoader.getResource("geckodriver.exe");
+	        String os = System.getProperty("os.name").toLowerCase();
 	        
-			if(setupFirefoxDriver) {
-				
-				ClassLoader classLoader = getClass().getClassLoader();
-		        URL resource = classLoader.getResource("geckodriver.exe");
-		        String os = System.getProperty("os.name").toLowerCase();
-		        
-		        //Make a directory to place Drivers in
-		        //This is used for later where we want multiple drivers
-		        File f = new File("Driver");
-		        if (!f.exists()) {
-		            f.mkdirs();
-		        }
-		        
-		        File geckodriver;
-		        //In the case of a MAC, we may need to copy the tar.gz file and then reference the resulting geckodriver application
-		        if(os.contains("mac")) {
-		            geckodriver = new File(System.getProperty("user.dir") + "/geckodriver");  
-		        }else {
-		        	geckodriver = new File("Driver" + "\\geckodriver.exe"); 
-		            if (!geckodriver.exists()) {
-		            	geckodriver.createNewFile();
-		                FileUtils.copyURLToFile(resource, geckodriver);
-		            }
-		        }
-		        String geckodriverLocation = geckodriver.getAbsolutePath();        
-		        System.setProperty("webdriver.gecko.driver", geckodriverLocation);
-			    driver = new FirefoxDriver();
-			    addActionToNavigationPathAlternate("[Initialize " + geckodriverLocation + "]\r\n");
-			}
+	        //Make a directory to place Drivers in
+	        //This is used for later where we want multiple drivers
+	        File f = new File("Driver");
+	        if (!f.exists()) {
+	            f.mkdirs();
+	        }
+	        
+	        File geckodriver;
+	        //In the case of a MAC, we may need to copy the tar.gz file and then reference the resulting geckodriver application
+	        if(os.contains("mac")) {
+	            geckodriver = new File(System.getProperty("user.dir") + "/geckodriver");  
+	        }else {
+	        	geckodriver = new File("Driver" + "\\geckodriver.exe"); 
+	            if (!geckodriver.exists()) {
+	            	geckodriver.createNewFile();
+	                FileUtils.copyURLToFile(resource, geckodriver);
+	            }
+	        }
+	        String geckodriverLocation = geckodriver.getAbsolutePath();        
+	        System.setProperty("webdriver.gecko.driver", geckodriverLocation);
+		    driver = new FirefoxDriver();
+		    addActionToNavigationPathAlternate("[Initialize " + geckodriverLocation + "]\r\n");
+		}
 
-			//chromeDriverLocation == "the driver"
-			//chromeBinaryLocation == "the car"
-		    if(setupChromeDriver) {
-				if(chromeBinaryLocation.length()>0) {
-					/***
-					 * From our resources folder, copy chromedriver.exe into a Driver folder
-					 * Modify that chrome driver to attach to the chrome binary as designated in the Fitnesse table
-					 */
-					ClassLoader classLoader = getClass().getClassLoader();
-			        URL resource = classLoader.getResource("chromedriver.exe");
-					File chromedriver = new File("Driver"+"\\chromedriver.exe");
-		            if (!chromedriver.exists()) {
-		            	chromedriver.createNewFile();
-		                FileUtils.copyURLToFile(resource, chromedriver);
-		            }
-					String chromeDriverLocation = chromedriver.getAbsolutePath();
-			        
-					ChromeOptions options = new ChromeOptions();
-					options.setBinary(chromeBinaryLocation);
-					options.addArguments("disable-infobars");
-					options.addArguments("--allow-file-access-from-files");
-					
-					System.setProperty("webdriver.chrome.driver", chromeDriverLocation);              
-					driver = new ChromeDriver(options);
+		//chromeDriverLocation == "the driver"
+		//chromeBinaryLocation == "the car"
+	    if(setupChromeDriver) {
+			if(chromeBinaryLocation.length()>0) {
+				/***
+				 * From our resources folder, copy chromedriver.exe into a Driver folder
+				 * Modify that chrome driver to attach to the chrome binary as designated in the Fitnesse table
+				 */
+				ClassLoader classLoader = getClass().getClassLoader();
+		        URL resource = classLoader.getResource("chromedriver.exe");
+				File chromedriver = new File("Driver"+"\\chromedriver.exe");
+	            if (!chromedriver.exists()) {
+	            	chromedriver.createNewFile();
+	                FileUtils.copyURLToFile(resource, chromedriver);
+	            }
+				String chromeDriverLocation = chromedriver.getAbsolutePath();
+		        
+				ChromeOptions options = new ChromeOptions();
+				options.setBinary(chromeBinaryLocation);
+				options.addArguments("disable-infobars");
+				options.addArguments("--allow-file-access-from-files");
+				
+				System.setProperty("webdriver.chrome.driver", chromeDriverLocation);              
+				driver = new ChromeDriver(options);
 //					System.out.println("Chrome driver in " + chromeDriverLocation + " is paired with binary " + chromeBinaryLocation);
-					addActionToNavigationPathAlternate("[Initialize " + chromeDriverLocation + "]\r\n");
-				}
-		    }
-		    
+				addActionToNavigationPathAlternate("[Initialize " + chromeDriverLocation + "]\r\n");
+			}
+	    }
+	    
 //		    driver.manage().window().setSize(new Dimension(1024, 768));	    
 //		    baseUrl = globalAddress;
-		    baseUrl = "http://www.google.com/";
-		    navigateByAddress(baseUrl);
-		    addActionToNavigationPathAlternate("-navigate to " + baseUrl);
-		    driver.manage().window().maximize(); 
-		    wait = new WebDriverWait(driver, 20);
-		    //make sure to right click the resources\images folder, select Build Path -> Include
-		    ImagePath.add(SimpleFramework.class.getCanonicalName()+"/images");
+//	    baseUrl = "http://www.google.com/";
+//	    navigateByAddress(baseUrl);
+//	    addActionToNavigationPathAlternate("-navigate to " + baseUrl);
+	    driver.manage().window().maximize(); 
+	    wait = new WebDriverWait(driver, 20);
+	    //make sure to right click the resources\images folder, select Build Path -> Include
+	    ImagePath.add(SimpleFramework.class.getCanonicalName()+"/images");
 
-	        id = 0;
-//	        pageScrollPosition = "";
-	        waitForElement = (long) 0;
-	        waitFactor = 20;
-	        pollingFactor = 1; //the bigger the value the faster the polling
-	        
-	        
-	        webEvents = new WebAppEventListener(driver);
-	        postSimulationArray = new ArrayList<String>();
-	        
-	        long startProcess = new Timestamp(System.currentTimeMillis()).getTime();
-	        depthNavigation(webEvents, false);
-	        long endProcess = new Timestamp(System.currentTimeMillis()).getTime();
-	        System.out.println("depthNavigation duration: "+(endProcess-startProcess)/1000 + "s ");
-//		}
-		
+        id = 0;
+        waitForElement = (long) 0;
+        waitFactor = 20;
+        pollingFactor = 1; //the bigger the value the faster the polling
+//        webEvents = new WebAppEventListener(driver);
+        postSimulationArray = new ArrayList<String>();
+
+	}
+	
+	public void startNavigation() {
+		webEvents = new WebAppEventListener(driver);
+        long startProcess = new Timestamp(System.currentTimeMillis()).getTime();
+        depthNavigation(webEvents, false);
+        long endProcess = new Timestamp(System.currentTimeMillis()).getTime();
+        System.out.println("depthNavigation duration: "+(endProcess-startProcess)/1000 + "s ");
+	}
+	
+	
+	public String outputPostSimulationArray() {
+		String str = "";
+		for(int i=0; i<postSimulationArray.size(); i++) {
+			str = str + postSimulationArray.get(i) +"\r\n";
+		}
+		return str;
 	}
 	
 	public void getOtherWindowHandles() {
@@ -1256,15 +1264,28 @@ public class FitnesseTestFixture {
 	
 	//recurse through a page
 	public void depthNavigation(WebAppEventListener webEvents, boolean newPage) {     
+		System.out.println("depthNavigation: newPage?" + newPage);
         if(newPage) {
         	webEvents = new WebAppEventListener(driver);//if we have a new page, this should rewrite the webEvents parameter, otherwise, if not new page, we keep the webEvents
         }
         String[] keyAndValue = webEvents.returnFirstKeyAndValue();
         String key = keyAndValue[0];
         String value = keyAndValue[1].toLowerCase();
+        String attributeName = webEvents.getAttributeName();
         webEvents.removeFirstKeyAndValueGivenKey(key);
         List<String> interactionsList = extractInteractions(value);
-        WebElement el = driver.findElement(By.id(key));        
+        System.out.println(
+        		"\r\nkey: "+key+
+        		"\r\nvalue: " +value+
+        		"\r\nattributeName: " +attributeName+
+        		"\r\ninteractionsList.size(): " +interactionsList.size()
+        		);
+        for(int i=0; i<interactionsList.size(); i++) {
+        	System.out.println("interactions: " + interactionsList.get(i));
+        }
+        
+//        WebElement el = driver.findElement(By.id(key)); 
+        WebElement el = driver.findElement(By.cssSelector("["+attributeName+"='"+key+"']"));
         
         if(interactionsList.contains("mouse")) {
         	waitForIdenticalPageSources();
@@ -1289,6 +1310,8 @@ public class FitnesseTestFixture {
         		depthNavigation(webEvents,newPage);
         	}
         }
+        
+        depthNavigation(webEvents,false);
 	}
 	
 	public List<String> extractInteractions(String value){

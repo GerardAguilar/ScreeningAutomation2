@@ -125,6 +125,7 @@ public class WebAppEventListener {
 	    createLogFile();
 	    
 	    waitForLoadToFinish();
+	    isjQueryLoaded(driver);
 	    
 //	    String xpathString = "//li[@id='menu-item-33']//a[@href='http://store.demoqa.com/products-page/product-category/']";
 //	    WebElement el = driver.findElement(By.xpath(xpathString));
@@ -305,7 +306,7 @@ public class WebAppEventListener {
 			pairValue = pair.getValue().toString();
 			mapCountStr = String.format("%04d", mapCount);
 			if(pairValue.contains("click")) {
-				System.out.println(mapCountStr + ": Click-able: " + pair.getKey() + ": " + pairValue);
+//				System.out.println(mapCountStr + ": Click-able: " + pair.getKey() + ": " + pairValue);
 				element = driver.findElement(By.cssSelector("["+attributeName+"='"+pair.getKey()+"']"));
 //				element.click();
 //				try {
@@ -316,11 +317,11 @@ public class WebAppEventListener {
 			}
 			
 			if(pairValue.contains("mouseover")|pairValue.contains("mouseout")) {
-				System.out.println(mapCountStr + ": Mouse-able: " + pair.getKey() + ": " + pairValue);
+//				System.out.println(mapCountStr + ": Mouse-able: " + pair.getKey() + ": " + pairValue);
 			}
 			
 			if(pairValue.contains("href")) {
-				System.out.println(mapCountStr + ": Has-href: " + pair.getKey() + ": " + pairValue);
+//				System.out.println(mapCountStr + ": Has-href: " + pair.getKey() + ": " + pairValue);
 			}
 			mapCount++;
 		}
@@ -512,7 +513,7 @@ public class WebAppEventListener {
 	public void isjQueryLoaded(WebDriver driver) {
 //	    System.out.println("Waiting for ready state complete");
 		//return typeof jQuery != 'undefined'
-		startTimer("isjQueryLoaded");
+//		startTimer("isjQueryLoaded");
 	    (new WebDriverWait(driver, 30)).until(new ExpectedCondition<Boolean>() {
 	            public Boolean apply(WebDriver d) {
 	                JavascriptExecutor js = (JavascriptExecutor) d;
@@ -521,8 +522,8 @@ public class WebAppEventListener {
 	                return (Boolean) js.executeScript("return !!window.jQuery && window.jQuery.active == 0");
 	            }
 	        });
-		endTimer("isjQueryLoaded");
-		getDuration("isjQueryLoaded");
+//		endTimer("isjQueryLoaded");
+//		getDuration("isjQueryLoaded");
 	}
 	
 	public String[] returnFirstKeyAndValue() {
@@ -537,6 +538,10 @@ public class WebAppEventListener {
 	
 	public void removeFirstKeyAndValueGivenKey(String key) {
 		elementAttributesAndEventHandlers.remove(key);
+	}
+	
+	public String getAttributeName() {
+		return attributeName;
 	}
 	
 	public static void main(String[] args) {

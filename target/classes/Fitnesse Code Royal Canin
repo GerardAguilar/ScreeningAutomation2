@@ -1,0 +1,56 @@
+!***> paths
+!define TEST_SYSTEM {slim}
+!path import java.awt.Color;
+!path import java.awt.image.BufferedImage;
+!path import java.io.BufferedWriter; 
+!path import java.io.File;
+!path import java.io.FileNotFoundException;
+!path import java.io.FileWriter;
+!path import java.io.IOException;
+!path import java.io.PrintWriter;
+!path import java.net.URL;
+!path import java.sql.Timestamp;
+!path import java.util.ArrayList;
+!path import java.util.concurrent.TimeUnit;
+!path import javax.imageio.ImageIO;
+!path import org.apache.commons.io.FileUtils;
+!path import org.openqa.selenium.By;
+!path import org.openqa.selenium.Dimension;
+!path import org.openqa.selenium.JavascriptExecutor;
+!path import org.openqa.selenium.NoSuchElementException;
+!path import org.openqa.selenium.OutputType;
+!path import org.openqa.selenium.TakesScreenshot;
+!path import org.openqa.selenium.WebDriver;
+!path import org.openqa.selenium.WebElement;
+!path import org.openqa.selenium.chrome.ChromeDriver;
+!path import org.openqa.selenium.chrome.ChromeOptions;
+!path import org.openqa.selenium.firefox.FirefoxDriver;
+!path import org.openqa.selenium.interactions.Actions;
+!path import org.openqa.selenium.support.ui.ExpectedConditions;
+!path import org.openqa.selenium.support.ui.FluentWait;
+!path import org.openqa.selenium.support.ui.Wait;
+!path import org.openqa.selenium.support.ui.WebDriverWait;
+!path import org.sikuli.script.FindFailed;
+!path import org.sikuli.script.ImagePath;
+!path import org.sikuli.script.Region;
+!path import org.sikuli.script.Screen;
+!path import com.google.common.base.Function;
+*!
+
+!***> imports
+
+|import                   |
+|com.inhance.testFramework|
+
+|import            |
+|fitnesse.slim.test|
+
+|import           |
+|fitnesse.fixtures|
+*!
+
+!| FitnesseTestFixture                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+|global address       |navigate by global address?|page Scroll Position|scroll Down X Full Screen Page Height And Wait?|xpath                     |will click|will wait for|check Visibility By Width|check Visibility By Clickability|check Visibility By Visbility|check Invisibility|click element by xpath?|wait for element?|taking baseline set|enable screenshot|take screenshot?|get navigation path alt event id?|make a log file|create log file?|
+|http://localhost:8024|                           |0                   |                                               |//div[@class='se-pre-con']|          |true         |                         |                                |                             |true              |                       |                 |                   |true             |                |                                 |               |                |
+|                     |                           |0                   |                                               |//div[@class='petView']   |          |true         |true                     |true                            |true                         |                  |                       |                 |                   |true             |                |                                 |               |                |
+|                     |                           |0                   |                                               |//div[@class='petView']   |true      |             |                         |                                |                             |                  |                       |                 |                   |true             |                |                                 |               |                |
