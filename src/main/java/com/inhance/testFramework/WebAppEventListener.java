@@ -16,6 +16,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
@@ -65,7 +66,7 @@ public class WebAppEventListener {
 
 	public WebAppEventListener() {
 		try {
-			initialize();
+//			initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -80,80 +81,80 @@ public class WebAppEventListener {
 		}
 	}
 	
-	public void initialize() throws Exception {
-		startTimer("initialize");
-		System.out.println("initialize");
-		//chromeDriverLocation == "the driver"
-		//chromeBinaryLocation == "the car"
-		/***
-		 * From our resources folder, copy chromedriver.exe into a Driver folder
-		 * Modify that chrome driver to attach to the chrome binary as designated in the Fitnesse table
-		 */
-		ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource("chromedriver.exe");
-		File chromedriver = new File("Driver"+"\\chromedriver.exe");
-        if (!chromedriver.exists()) {
-        	chromedriver.createNewFile();
-            FileUtils.copyURLToFile(resource, chromedriver);
-        }
-		String chromeDriverLocation = chromedriver.getAbsolutePath();
-        
-		ChromeOptions options = new ChromeOptions();
-		options.setBinary("C:\\GoogleChromePortable\\GoogleChromePortable.exe");
-		options.addArguments("disable-infobars");
-		options.addArguments("--allow-file-access-from-files");
-		
-		System.setProperty("webdriver.chrome.driver", chromeDriverLocation);              
-		driver = new ChromeDriver(options);
-		
-		calendar = Calendar.getInstance();		
-		sdf = new SimpleDateFormat("yyyyMMMdd");
-		attributeName = "qaId"+sdf.format(calendar.getTime());
-		startDataStr = "qaEventHandlers"+sdf.format(calendar.getTime());
-		javascriptString= 
-				"var type = document.createAttribute(arguments[1]);" + 
-				"type.nodeValue = arguments[2];" + 
-				"arguments[0].setAttributeNode(type);";
-		
-//		String baseUrl = "http://localhost:8024/index.html?pet=Dog";
-		String baseUrl = "http://www.inhance.com";
-//		String baseUrl = "http://store.demoqa.com/";
-	    driver.get(baseUrl);
-	    endTimer("initialize");
-	    getDuration("initialize");
-	    elementAttributesAndEventHandlers = new HashMap();
-	    createLogFile();
-	    
-	    waitForLoadToFinish();
-	    isjQueryLoaded(driver);
-	    
-//	    String xpathString = "//li[@id='menu-item-33']//a[@href='http://store.demoqa.com/products-page/product-category/']";
-//	    WebElement el = driver.findElement(By.xpath(xpathString));
-	    
-	    //driver.findElements would have to be recreated to store xpaths of each element instead, why not use xslt?
-	    List<WebElement> elList = driver.findElements(By.xpath("//*"));
-	    generateCustomIdForWebElementList(elList);
-	    //Tree or dictionary?
-	    //A Tree would be faster, but a dictionary would be easier to create
-//	    Dictionary<WebElement, String> elDictionary = new Dictionary<WebElement, String>();//dictionary is deprecated in Java
-//	    HashMap<String, WebElement> elMap = new HashMap<String, WebElement>();
-//	    String xpathKey;
-	    
-	    
-//	    for(int i=0; i<elList.size(); i++) {
-//	    	xpathKey = getXpathOfWebElement(elList, i);
-//	    	elMap.put(xpathKey, elList.get(i));
-//	    }
-	    
-//	    for(int i=0; i<elList.size(); i++) {
-////	    	System.out.print(i+": " + elList.get(i).getTagName()+ "\t");
-//	    	System.out.print(i+": " + elList.get(i).getTagName()+ "\n");
-//	    	lookForEventListeners(elList.get(i));	    	
-//	    }
-
-	    
-
-	}
+//	public void initialize() throws Exception {
+//		startTimer("initialize");
+//		System.out.println("initialize");
+//		//chromeDriverLocation == "the driver"
+//		//chromeBinaryLocation == "the car"
+//		/***
+//		 * From our resources folder, copy chromedriver.exe into a Driver folder
+//		 * Modify that chrome driver to attach to the chrome binary as designated in the Fitnesse table
+//		 */
+//		ClassLoader classLoader = getClass().getClassLoader();
+//        URL resource = classLoader.getResource("chromedriver.exe");
+//		File chromedriver = new File("Driver"+"\\chromedriver.exe");
+//        if (!chromedriver.exists()) {
+//        	chromedriver.createNewFile();
+//            FileUtils.copyURLToFile(resource, chromedriver);
+//        }
+//		String chromeDriverLocation = chromedriver.getAbsolutePath();
+//        
+//		ChromeOptions options = new ChromeOptions();
+//		options.setBinary("C:\\GoogleChromePortable\\GoogleChromePortable.exe");
+//		options.addArguments("disable-infobars");
+//		options.addArguments("--allow-file-access-from-files");
+//		
+//		System.setProperty("webdriver.chrome.driver", chromeDriverLocation);              
+//		driver = new ChromeDriver(options);
+//		
+//		calendar = Calendar.getInstance();		
+//		sdf = new SimpleDateFormat("yyyyMMMdd");
+//		attributeName = "qaId"+sdf.format(calendar.getTime());
+//		startDataStr = "qaEventHandlers"+sdf.format(calendar.getTime());
+//		javascriptString= 
+//				"var type = document.createAttribute(arguments[1]);" + 
+//				"type.nodeValue = arguments[2];" + 
+//				"arguments[0].setAttributeNode(type);";
+//		
+////		String baseUrl = "http://localhost:8024/index.html?pet=Dog";
+//		String baseUrl = "http://www.inhance.com";
+////		String baseUrl = "http://store.demoqa.com/";
+//	    driver.get(baseUrl);
+//	    endTimer("initialize");
+//	    getDuration("initialize");
+//	    elementAttributesAndEventHandlers = new HashMap();
+//	    createLogFile();
+//	    
+//	    waitForLoadToFinish();
+//	    isjQueryLoaded(driver);
+//	    
+////	    String xpathString = "//li[@id='menu-item-33']//a[@href='http://store.demoqa.com/products-page/product-category/']";
+////	    WebElement el = driver.findElement(By.xpath(xpathString));
+//	    
+//	    //driver.findElements would have to be recreated to store xpaths of each element instead, why not use xslt?
+//	    List<WebElement> elList = driver.findElements(By.xpath("//*"));
+//	    generateCustomIdForWebElementList(elList);
+//	    //Tree or dictionary?
+//	    //A Tree would be faster, but a dictionary would be easier to create
+////	    Dictionary<WebElement, String> elDictionary = new Dictionary<WebElement, String>();//dictionary is deprecated in Java
+////	    HashMap<String, WebElement> elMap = new HashMap<String, WebElement>();
+////	    String xpathKey;
+//	    
+//	    
+////	    for(int i=0; i<elList.size(); i++) {
+////	    	xpathKey = getXpathOfWebElement(elList, i);
+////	    	elMap.put(xpathKey, elList.get(i));
+////	    }
+//	    
+////	    for(int i=0; i<elList.size(); i++) {
+//////	    	System.out.print(i+": " + elList.get(i).getTagName()+ "\t");
+////	    	System.out.print(i+": " + elList.get(i).getTagName()+ "\n");
+////	    	lookForEventListeners(elList.get(i));	    	
+////	    }
+//
+//	    
+//
+//	}
 	public void initialize(WebDriver driverParam) throws Exception {
 		startTimer("initialize");
 		this.driver = driverParam;
@@ -172,6 +173,7 @@ public class WebAppEventListener {
 	    createLogFile();
 	    
 	    waitForLoadToFinish();
+	    isjQueryLoaded(driver);
 	    List<WebElement> elList = driver.findElements(By.xpath("//*"));
 	    generateCustomIdForWebElementList(elList);
 
@@ -402,15 +404,68 @@ public class WebAppEventListener {
 				"arguments[0].setAttributeNode(type);" +
 				"var items = {};"+
 				"for (index = 0; index <arguments[0].attributes.length; ++index){"+
-				"	items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value;"+
+				"	items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value"+
 				"};"+
-				"var startData = arguments[3];"+
+//				"var startData = arguments[3];"+
 				"	items[arguments[3]] = jQuery._data(arguments[0], \"events\");"+
+//				"var events = {};"+
+//				"events = jQuery._data(arguments[0], \"events\");" +
+//				"var temp = {};"+
+//				"for (index = 0; index <events.size(); ++index){"+
+//				"temp = events[index].split(\"=\");"+
+//				"items[temp[0]] = temp[1];"+
+//				"};"+
 				"return items;";
 
 		String attributesAndEvents = jseCopy.executeScript(javascriptString,  el, attributeName, value, startDataStr)+"";
+		if(attributesAndEvents.contains("qaEventHandlers2018Jun13={")) {
+			System.out.println("tagElementAlt: " + attributesAndEvents);			
+		}
 		elementAttributesAndEventHandlers.put(value, attributesAndEvents);
 		return attributesAndEvents;
+	}
+	
+	public static List<String> generateEventList(String str){
+		List<String> ls = new ArrayList<String>();
+		CharStack stack = new CharStack();
+		String temp = "";
+		for(int i=0; i<str.length(); i++) {
+			if(str.charAt(i)=='}') {
+				//pop chars until {
+				while(stack.size()!=0 && stack!=null) {
+					//should only occur once during the while loop
+					if(stack.peek()=='{') {
+//						temp = stack.pop() + temp;	
+						stack.pop();
+						//append list
+						ls.add(temp);
+						temp = "";
+						break;
+					}else {
+						temp = stack.pop() + temp;
+					}					
+				}
+			}else if(str.charAt(i) == ']') {
+				//pop chars until [				
+				while(stack.size()!=0 && stack!=null) {
+					//should only occur once during the while loop
+					if(stack.peek()=='[') {
+//						temp = stack.pop() + temp;
+						stack.pop();
+						//append list
+						ls.add(temp);
+						temp = "";
+						break;
+					}else {
+						temp = stack.pop() + temp;
+					}		
+				}
+			}else {
+				//fill up our stack
+				stack.push(str.charAt(i));
+			}
+		}	
+		return ls;
 	}
 
 	//This needs to be more responsive
@@ -420,7 +475,7 @@ public class WebAppEventListener {
 	    startTimer("waitForLoadToFinish");
 		System.out.println("waitForLoadToFinish()");
 		try {
-			Thread.sleep(6000);
+			Thread.sleep(7000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -511,7 +566,7 @@ public class WebAppEventListener {
 	}
 	
 	public void isjQueryLoaded(WebDriver driver) {
-//	    System.out.println("Waiting for ready state complete");
+	    System.out.println("Waiting for jquery ready state complete");
 		//return typeof jQuery != 'undefined'
 //		startTimer("isjQueryLoaded");
 	    (new WebDriverWait(driver, 30)).until(new ExpectedCondition<Boolean>() {
@@ -530,10 +585,15 @@ public class WebAppEventListener {
 		String[] strArray = new String[2];
 		Map mp = (Map)elementAttributesAndEventHandlers;
 		java.util.Iterator<Map.Entry> it = mp.entrySet().iterator();
-		Map.Entry pair = (Map.Entry)it.next();
-		strArray[0] = pair.getKey().toString();
-		strArray[1] = pair.getValue().toString();		
-		return strArray;
+		if(it.hasNext()) {
+			Map.Entry pair = (Map.Entry)it.next();
+			strArray[0] = pair.getKey().toString();
+			strArray[1] = pair.getValue().toString();//this is our collection of event handlers		
+			return strArray;			
+		}
+		else {
+			return null;
+		}
 	}
 	
 	public void removeFirstKeyAndValueGivenKey(String key) {
@@ -547,4 +607,30 @@ public class WebAppEventListener {
 	public static void main(String[] args) {
 		WebAppEventListener temp = new WebAppEventListener();
 	}
+}
+
+//partially from https://stackoverflow.com/questions/8746428/how-to-define-a-char-stack?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+class CharStack {
+    final StringBuilder sb = new StringBuilder();
+
+    public void push(char ch) {
+        sb.append(ch);
+    }
+
+    public char pop() {
+        int last = sb.length() -1;
+        char ch= sb.charAt(last);
+        sb.setLength(last);
+        return ch;
+    }
+    
+    public char peek() {
+    	int last = sb.length() -1;
+    	char ch= sb.charAt(last);
+    	return ch;
+    }
+
+    public int size() {
+        return sb.length();
+    }
 }

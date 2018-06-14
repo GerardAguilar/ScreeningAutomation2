@@ -584,7 +584,9 @@ public class FitnesseTestFixture {
 	}
 	
 	public void simulateAlt(String action, WebElement el) {
-		switch (action) {
+//		if(isVisibleInViewport(el)) {
+//			System.out.println("Element is visible: " );
+			switch (action) {
 			case "click":
 				clickElementByWebElement(el);//need to encapsulate to update navpath
 				break;
@@ -593,7 +595,9 @@ public class FitnesseTestFixture {
 				break;
 			default: 
 				break;
-		}
+			}			
+//		}
+
 	}
 	
 	//TODO postSimulation()
@@ -677,7 +681,7 @@ public class FitnesseTestFixture {
 	}
 	
 	public void hoverOverElementAlt(WebElement el) {
-		if(xpath.length()>0 && willSimulateHover) {
+//		if(xpath.length()>0 && willSimulateHover) {
 			addActionToNavigationPathAlternate("-hoverAlt over " + xpath);		
 			Actions builder = new Actions(driver);
 					
@@ -689,7 +693,7 @@ public class FitnesseTestFixture {
 //	        System.out.println("Element is located at: " + xcordi + ": "+ycordi);
 
 			builder.moveToElement(el).perform();
-		}	
+//		}	
 	}
 		
 	//Wait for image to appear
@@ -1269,62 +1273,103 @@ public class FitnesseTestFixture {
         	webEvents = new WebAppEventListener(driver);//if we have a new page, this should rewrite the webEvents parameter, otherwise, if not new page, we keep the webEvents
         }
         String[] keyAndValue = webEvents.returnFirstKeyAndValue();
-        String key = keyAndValue[0];
-        String value = keyAndValue[1].toLowerCase();
-        String attributeName = webEvents.getAttributeName();
-        webEvents.removeFirstKeyAndValueGivenKey(key);
-        List<String> interactionsList = extractInteractions(value);
-        System.out.println(
-        		"\r\nkey: "+key+
-        		"\r\nvalue: " +value+
-        		"\r\nattributeName: " +attributeName+
-        		"\r\ninteractionsList.size(): " +interactionsList.size()
-        		);
-        for(int i=0; i<interactionsList.size(); i++) {
-        	System.out.println("interactions: " + interactionsList.get(i));
+        if(keyAndValue!=null) {
+        	String key = keyAndValue[0];
+            String value = keyAndValue[1].toLowerCase();
+            String attributeName = webEvents.getAttributeName();
+            webEvents.removeFirstKeyAndValueGivenKey(key);
+            final WebElement el = driver.findElement(By.cssSelector("["+attributeName+"='"+key+"']"));
+            
+//            String valueAlt = el.getCssValue("qaeventhandlers2018jun13");
+//            String valueAlt = el.getAttribute("qaeventhandlers2018jun13");
+            List<String> interactionsList = extractInteractions(value, el);
+//            List<String> interactionsListAlt = webEvents.generateEventList(valueAlt);
+            System.out.println(
+            		"\r\nkey: "+key+
+            		"\r\nattributeName: " +attributeName+
+            		"\r\ninteractionsListAlt.size(): " +interactionsList.size() +
+            		"\r\nvalue: " +value
+            		);
+            for(int i=0; i<interactionsList.size(); i++) {
+            	System.out.println("interactionsListAlt: " + interactionsList.get(i));
+            }
+            
+//            checkIfHoverable();
+            if(interactionsList.contains("mouse")) {
+            	waitForIdenticalPageSources();
+            	if(isVisibleInViewport(el)) {
+            		System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
+            		simulateAlt("hover", el);
+            	}
+            	waitForIdenticalPageSources();       
+            	postSimulationArray.add(postSimulation());
+            	depthNavigation(webEvents,newPage);
+            }
+            
+//            checkIfClickable();
+            if(interactionsList.contains("click")) {
+            	String urlBefore = driver.getCurrentUrl();
+            	waitForIdenticalPageSources();
+            	if(isVisibleInViewport(el)) {
+            		System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
+    	        	simulateAlt("click", el);
+            	}
+            	waitForIdenticalPageSources();
+            	postSimulationArray.add(postSimulation());
+            	String urlAfter = driver.getCurrentUrl();
+            	if(!urlAfter.equals(urlBefore)) {
+            		newPage = true;
+            		depthNavigation(webEvents,newPage);
+            	}else {
+            		newPage = false;
+            		depthNavigation(webEvents,newPage);
+            	}
+            }
+            
+            depthNavigation(webEvents,false);
+        }else {
+        	System.out.println("End of Branch");
         }
         
-//        WebElement el = driver.findElement(By.id(key)); 
-        WebElement el = driver.findElement(By.cssSelector("["+attributeName+"='"+key+"']"));
-        
-        if(interactionsList.contains("mouse")) {
-        	waitForIdenticalPageSources();
-        	simulateAlt("hover", el);
-        	waitForIdenticalPageSources();       
-        	postSimulationArray.add(postSimulation());
-        	depthNavigation(webEvents,newPage);
-        }
-        
-        if(interactionsList.contains("click")) {
-        	String urlBefore = driver.getCurrentUrl();
-        	waitForIdenticalPageSources();
-        	simulateAlt("click", el);
-        	waitForIdenticalPageSources();
-        	postSimulationArray.add(postSimulation());
-        	String urlAfter = driver.getCurrentUrl();
-        	if(!urlAfter.equals(urlBefore)) {
-        		newPage = true;
-        		depthNavigation(webEvents,newPage);
-        	}else {
-        		newPage = false;
-        		depthNavigation(webEvents,newPage);
-        	}
-        }
-        
-        depthNavigation(webEvents,false);
 	}
 	
-	public List<String> extractInteractions(String value){
-		List<String> ls = new ArrayList<String>();
+	public List<String> extractInteractions(String value, WebElement el){
+//		List<String> ls = new ArrayList<String>();
+		List<String> ls = WebAppEventListener.generateEventList(value);
 		//append ls with interactions of el as extracted from webappeventlistener
-		if(value.contains("click")) {
-			ls.add("click");
-		}		
-		if(value.contains("mouse")) {
-			ls.add("mouse");
-		}
+//		if(value.contains("click")) {
+//			ls.add("click");
+//		}		
+//		if(value.contains("mouse")) {
+//			ls.add("mouse");
+//		}
+		
+		//this may be a good spot to check for hrefs too, and class names
+		
 		return ls;
 	} 
+	
+
+	
+	//from https://stackoverflow.com/questions/45243992/verification-of-element-in-viewport-in-selenium
+	public Boolean isVisibleInViewport(WebElement element) {
+		  return (Boolean)((JavascriptExecutor)driver).executeScript(
+		      "var elem = arguments[0],                 " +
+		      "  box = elem.getBoundingClientRect(),    " +
+		      "  cx = box.left + box.width / 2,         " +
+		      "  cy = box.top + box.height / 2,         " +
+		      "  e = document.elementFromPoint(cx, cy); " +
+		      "for (; e; e = e.parentElement) {         " +
+		      "  if (e === elem)                        " +
+		      "    return true;                         " +
+		      "}                                        " +
+		      "return false;                            "
+		      , element);
+	}
+	
+//	public Boolean checkIfClickable() {
+//		
+//	}
 
 	//Needed to create an instance for Fitnesse to work with
 	public static void main(String[] args) {
