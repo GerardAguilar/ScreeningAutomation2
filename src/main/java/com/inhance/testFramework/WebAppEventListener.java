@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -173,7 +174,14 @@ public class WebAppEventListener {
 	    createLogFile();
 	    
 	    waitForLoadToFinish();
-	    isjQueryLoaded(driver);
+	    try {
+	    	isjQueryLoaded(driver);
+	    }catch(TimeoutException e) {
+	    	System.out.println("Jquery is not loaded, injecting Jquery....");
+	    }finally {
+	    	injectJquery();
+	    }
+	    
 	    List<WebElement> elList = driver.findElements(By.xpath("//*"));
 	    generateCustomIdForWebElementList(elList);
 
@@ -565,11 +573,13 @@ public class WebAppEventListener {
 		return aa.toString();
 	}
 	
-	public void isjQueryLoaded(WebDriver driver) {
+	//Throws an unignored Timeout exception
+	//need to do either promises or try/catch/finally block
+	public boolean isjQueryLoaded(WebDriver driver) {
 	    System.out.println("Waiting for jquery ready state complete");
 		//return typeof jQuery != 'undefined'
 //		startTimer("isjQueryLoaded");
-	    (new WebDriverWait(driver, 30)).until(new ExpectedCondition<Boolean>() {
+	    boolean test = new WebDriverWait(driver, 30).until(new ExpectedCondition<Boolean>() {
 	            public Boolean apply(WebDriver d) {
 	                JavascriptExecutor js = (JavascriptExecutor) d;
 	                String readyState = js.executeScript("return document.readyState").toString();
@@ -577,6 +587,7 @@ public class WebAppEventListener {
 	                return (Boolean) js.executeScript("return !!window.jQuery && window.jQuery.active == 0");
 	            }
 	        });
+	    return test;
 //		endTimer("isjQueryLoaded");
 //		getDuration("isjQueryLoaded");
 	}
@@ -602,6 +613,24 @@ public class WebAppEventListener {
 	
 	public String getAttributeName() {
 		return attributeName;
+	}
+	
+	public void injectJquery() {
+		System.out.println("injectJquery start");
+		String injectJqueryCommand =
+				"    function l(u, i) {\r\n" + 
+				"        var d = document;\r\n" + 
+				"        if (!d.getElementById(i)) {\r\n" + 
+				"            var s = d.createElement('script');\r\n" + 
+				"            s.src = u;\r\n" + 
+				"            s.id = i;\r\n" + 
+				"            d.body.appendChild(s);\r\n" + 
+				"        }\r\n" + 
+				"    }\r\n" + 
+				"    l('//code.jquery.com/jquery-3.2.1.min.js', 'jquery');";
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		js.executeScript(injectJqueryCommand);
+		System.out.println("injectJquery end");
 	}
 	
 	public static void main(String[] args) {

@@ -860,6 +860,7 @@ public class FitnesseTestFixture {
 	public String Image() {
 		String currentImageId = getNavigationPathAltEventId()+"";
 		String currentImagePath = getLastSetOfActions(navigationPathAlternate, 1);
+		//if interacting, hide the image
 		if(willSimulateClick
 				||willSimulateHover
 				||willSimulateNavigation.length()>0
@@ -888,7 +889,8 @@ public class FitnesseTestFixture {
 	}
 	
 	public void clickElementByWebElement(WebElement el) {
-		addActionToNavigationPathAlternate("-click " + xpath);
+//		addActionToNavigationPathAlternate("-click " + xpath);
+		addActionToNavigationPathAlternate("-click " + el.getTagName());
 		el.click();
 	}
 	
@@ -1290,38 +1292,32 @@ public class FitnesseTestFixture {
             		"\r\ninteractionsListAlt.size(): " +interactionsList.size() +
             		"\r\nvalue: " +value
             		);
-            for(int i=0; i<interactionsList.size(); i++) {
-            	System.out.println("interactionsListAlt: " + interactionsList.get(i));
-            }
-            
-//            checkIfHoverable();
-            if(interactionsList.contains("mouse")) {
-            	waitForIdenticalPageSources();
-            	if(isVisibleInViewport(el)) {
-            		System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
-            		simulateAlt("hover", el);
-            	}
-            	waitForIdenticalPageSources();       
-            	postSimulationArray.add(postSimulation());
-            	depthNavigation(webEvents,newPage);
-            }
+//            for(int i=0; i<interactionsList.size(); i++) {
+//            	System.out.println("interactionsListAlt: " + interactionsList.get(i));
+//            }
+//            
+////            checkIfHoverable();
+//            if(interactionsList.contains("mouse")) {
+//            	waitForIdenticalPageSources();
+//            	if(isVisibleInViewport(el)) {
+//            		System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
+//            		simulateAlt("hover", el);
+//            	}
+//            	waitForIdenticalPageSources();       
+//            	postSimulationArray.add(postSimulation());
+//            	depthNavigation(webEvents,newPage);
+//            }
             
 //            checkIfClickable();
-            if(interactionsList.contains("click")) {
+            if((interactionsList.contains("click")||isElementNativelyClickable(el)) && isVisibleInViewport(el)) {
             	String urlBefore = driver.getCurrentUrl();
             	waitForIdenticalPageSources();
-            	if(isVisibleInViewport(el)) {
-            		System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
-    	        	simulateAlt("click", el);
-            	}
+            	System.out.println(key + " is visible: (" + el.getLocation().toString()+")" );
+    	        simulateAlt("click", el);
             	waitForIdenticalPageSources();
             	postSimulationArray.add(postSimulation());
-            	String urlAfter = driver.getCurrentUrl();
-            	if(!urlAfter.equals(urlBefore)) {
-            		newPage = true;
-            		depthNavigation(webEvents,newPage);
-            	}else {
-            		newPage = false;
+            	newPage = isThereANewBranchContext(urlBefore);
+            	if(newPage) {
             		depthNavigation(webEvents,newPage);
             	}
             }
@@ -1329,9 +1325,26 @@ public class FitnesseTestFixture {
             depthNavigation(webEvents,false);
         }else {
         	System.out.println("End of Branch");
-        }
-        
+        }        
 	}
+	
+	public boolean isThereANewBranchContext(String urlBefore) {
+    	String urlAfter = driver.getCurrentUrl();
+    	boolean newPage;
+    	if(!urlAfter.equals(urlBefore)) {
+    		newPage = true;
+    	}else {
+    		newPage = false;
+    	}
+    	return newPage;
+	}
+	
+	public boolean scanDiffForNewInteractableElements() {
+		boolean newInteractableElementsArePresent=false;
+		
+		return newInteractableElementsArePresent;
+	}
+	
 	
 	public List<String> extractInteractions(String value, WebElement el){
 //		List<String> ls = new ArrayList<String>();
@@ -1348,6 +1361,16 @@ public class FitnesseTestFixture {
 		
 		return ls;
 	} 
+	
+	public boolean isElementNativelyClickable(WebElement el) {
+		boolean elementIsNativelyClickable = false;
+		//natively clickable
+		String tag = el.getTagName();
+		if(tag.equals("select") || tag.equals("option") || tag.equals("button")) {
+			elementIsNativelyClickable = true;
+		}
+		return elementIsNativelyClickable;
+	}
 	
 
 	
